@@ -1,7 +1,10 @@
+from . import CONN, CURSOR
+
 class Recommondations:
     def __init__(self, title):
         self.title = title
         self.id = id
+
     @classmethod
     def create_table(self):
         sql = '''CREATE TABLE if not exists anime_recommondations(id INTEGER PRIMARY KEY,
@@ -49,20 +52,29 @@ class Anime:
 
 class Questions:
     def __init__(self, questions):
-        self.question = questions
+        self.questions = questions
         self.id = id
 
     @classmethod
     def create_table(self):
         sql = '''CREATE TABLE if not exists questions_table (id INTEGER PRIMARY KEY,
-        title TEXT
+        questions TEXT
         );'''
         CURSOR.execute(sql)
         CONN.commit()
 
+    def create(self):
+        sql = '''INSERT INTO questions_table (questions) VALUES (?)'''
+        CURSOR.execute(sql, [self.questions])
+        CONN .commit()
+
+        last_row_sql = "SELECT * FROM questions_table ORDER BY id DESC LIMIT 1"
+        last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
+        self.id = last_row_tuple[0]
+
     @classmethod
     def read_all(cls):
         sql = '''SELECT * FROM questions_table;'''
-        
+
         all_questions_tuple = CURSOR.execute(sql).fetchall()
         return all_questions_tuple
