@@ -78,3 +78,9 @@ class Questions:
 
         all_questions_tuple = CURSOR.execute(sql).fetchall()
         return all_questions_tuple
+
+    @classmethod
+    def update_id(cls, id, id1):
+        sql = '''UPDATE questions_table SET id = ? WHERE id = ?''' 
+        CURSOR.execute(sql, [id, id1])
+        CONN.commit()
