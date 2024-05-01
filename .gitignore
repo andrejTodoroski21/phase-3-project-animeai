@@ -1,5 +1,3 @@
 .venv
 
-*.db
-
 __pychache__
