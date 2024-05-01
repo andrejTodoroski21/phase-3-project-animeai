@@ -29,8 +29,8 @@ class Recommondations:
 
 
 class Anime:
-    def __init__(self, anime):
-        self.anime = anime
+    def __init__(self, title):
+        self.title = title
         self.id = id
     
     @classmethod
@@ -42,8 +42,8 @@ class Anime:
         CONN.commit()
 
     def create(self):
-        sql = '''INSERT INTO animes_table(anime) VALUES (?)'''
-        CURSOR.execute(sql, [self.content])
+        sql = '''INSERT INTO animes_table(title) VALUES (?)'''
+        CURSOR.execute(sql, [self.title])
         CONN .commit()
 
         last_row_sql = "SELECT * FROM animes_table ORDER BY id DESC LIMIT 1"
