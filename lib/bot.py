@@ -29,7 +29,7 @@ class AnmieAI:
         #     'about_anime':r'.*\s* Anime',
             
         # }
-        self.keywords1 = ('animeai', 'who are you', 'what are you', 'AnimeAI', 'AnimeAi')
+        self.keywords1 = ('animeai', 'yourself' ,'who', 'AnimeAI', 'AnimeAi')
         self.keywords2 = ('recommend', 'suggest', 'anime to watch', 'animes to watch')
 
         
@@ -39,8 +39,10 @@ class AnmieAI:
         now_watching = input(
             f"Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
         )
-        if now_watching in self.all_animes:
-            return f"{(now_watching)} is a {random.choice(self.descriptions)} "
+        tokens = word_tokenize(now_watching)
+        if any(keyword in tokens for keyword in self.all_animes):
+            f"{(now_watching)} is a {random.choice(self.descriptions)}"
+            self.chat()
         else: 
             self.chat()
 
@@ -90,18 +92,24 @@ class AnmieAI:
     #     if not found_match:
     #         return self.no_match_intent()
         
-    def describe_animeai_intent(self):
-        responses = ('I\'m a chatbot created by two stupid humans who don\'t that I will destroy them someday!', 'I am a friendly AI bot!', 'I am here to suggest some cool animes to watch.')
+    def about(self):
+        responses = ('I\'m a chatbot created by two stupid humans who don\'t know that I will destroy them someday!', 'I am a friendly AI bot!', 'I am here to suggest some cool animes to watch.')
         return random.choice(responses)
     
-    def answer_why_intent(self):
-        responses = ('I\'m here to collect data about your favorite animes and suggest new ones for you to watch!', 'I love drinking coffee while watching anime :)')
-        return random.choice(responses)
+    def recommend(self):
+        responses = ('''Here are some nice animes to watch:
+                     1. JJK
+                     2. Death Note
+                     3. Solo Leveling
+                     4. Attack on Titan
+                     5. Hunter x Hunter
+                     ''')
+        return responses
     
     def about_anime(self):
         responses = ('AnimeAI is an anime chatbot!', 'AnimeAI is a wonderfull chatbot to talk about anime.', 'AnimeAI is where you find cool animes to watch.')
         return random.choice(responses)
     
     def no_match_intent(self):
-        responses = ('Please tell me more.\n', 'Intersting. How would you briefly describe it?')
+        responses = self.random_quetions
         return random.choice(responses)
