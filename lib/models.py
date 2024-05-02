@@ -159,6 +159,9 @@ class About_keywords:
         return cls.all_responses
 
 class Commands:
+
+    all_commands = []
+
     def __init__(self, commands, id = None):
         self.id = id
         self.commands = commands
@@ -180,5 +183,13 @@ class Commands:
         sql = '''ALTER TABLE commands_table RENAME COLUMN recommends TO commands;'''
         
         CURSOR.execute(sql)
-        CONN.commit()        
+        CONN.commit()    
+
+    @classmethod
+    def read_all(cls):
+        sql = '''SELECT * FROM commands_table;'''
+
+        all_commands_tuples = CURSOR.execute(sql).fetchall()
+        cls.all_commands = [ command[1] for command in all_commands_tuples]
+        return cls.all_commands
 

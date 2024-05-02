@@ -1,4 +1,5 @@
 import re
+import sys
 import random
 import nltk
 nltk.download('punkt')
@@ -40,25 +41,36 @@ class AnmieAI:
         now_watching = input(
             f"Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
         )
-        tokens = word_tokenize(now_watching)
+        tokens = sent_tokenize(now_watching)
+        tokens = [token.lower() for token in tokens]
         Anime.read_all()
-        print(tokens)
-        print(Anime.all_animes)
-        if (tokens in Anime.all_animes):
-            f"{(now_watching)} is a {random.choice(self.descriptions)} to watch"
-            self.chat()
+        if any(keyword in tokens for keyword in [anime.lower() for anime in Anime.all_animes]):
+            print(f"{(now_watching)} is a {random.choice(self.descriptions)}anime to watch")
+            return self.chat()
         else: 
-            self.chat()
+            return self.chat()
 
     def exit(self, reply):
-        for command in self.exit_commands:
-            if reply == command:
-                print("Have a good day!")
-            
+        Commands.read_all()
+        if reply in Commands.all_commands:
+            print ("Have a good day!")
+            return True
+        else:
+            return self.chat()
+
+    # def chat(self):
+    #     reply = input(random.choice(self.random_quetions)).lower()
+    #     while not self.exit(reply):
+    #         reply = input(self.match_reply(reply))
     def chat(self):
-        reply = input(random.choice(self.random_quetions)).lower()
-        while not self.exit(reply):
-            reply = input(self.match_reply(reply))
+        while True:
+            reply = input(random.choice(self.random_quetions)).lower()
+            if self.exit(reply):
+                return
+            else:
+                reply = input(self.match_reply(reply))
+
+    
 
     def match_reply(self, reply):
         tokens = word_tokenize(reply)
@@ -69,6 +81,7 @@ class AnmieAI:
             sentences = [ sentence.lower() for sentence in sentences]
         print(tokens)
         About_keywords.retreive_about_keywords()
+        Commands.read_all()
         if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
             return self.about() 
         elif any(keyword in tokens for keyword in self.keywords2):
@@ -77,8 +90,10 @@ class AnmieAI:
             return self.weather() 
         elif any(keyword in sentences for keyword in self.keywords4):
             return self.how_is_AI()
+        # elif any(keyword in tokens for keyword in Commands.all_commands):
+        #     return self.exit(reply)
         else:
-            return self.keep_chatting()
+            return self.chat()
    
         
     def about(self):
@@ -109,12 +124,12 @@ class AnmieAI:
         responses = ('I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'I don\'t feel anything, I\'m just a bot!')
         return random.choice(responses)
     
-    def keep_chatting(self):
-        Questions.read_all()
-        for q in Questions.all_questions:
-            if q not in self.asked_questions:
-                self.asked_questions.append(q)
-                return q
-        else:
-            self.asked_questions = []
-            return self.keep_chatting()
+    # def keep_chatting(self):
+    #     Questions.read_all()
+    #     for q in Questions.all_questions:
+    #         if q not in self.asked_questions:
+    #             self.asked_questions.append(q)
+    #             return q
+    #     # else:
+    #     #     self.asked_questions = []
+    #     #     return self.keep_chatting()
