@@ -1,31 +1,47 @@
 from . import CONN, CURSOR
 
 class Recommondations:
-    def __init__(self, title):
-        self.title = title
+    def __init__(self, recommendations, keywords, id = None):
+        self.recommendations = recommendations
         self.id = id
+        self.keywords = keywords
 
     @classmethod
     def create_table(self):
         sql = '''CREATE TABLE if not exists anime_recommondations(id INTEGER PRIMARY KEY,
-        title TEXT
+        recommendations TEXT , keywords TEXT
         );'''
         CURSOR.execute(sql)
         CONN.commit()
 
     def create(self):
-        sql = '''INSERT INTO anime_recommondations(content) VALUES (?)'''
-        CURSOR.execute(sql, [self.content])
+        sql = '''INSERT INTO anime_recommondations(recommendations, keywords) VALUES (?, ?)'''
+        CURSOR.execute(sql, [self.recommendations, self.keywords])
         CONN .commit()
-        last_row_sql = "SELECT * FROM anime_recommondations ORDER BY id DESC LIMIT 1"
-        last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
-        self.id = last_row_tuple[0]
+        # last_row_sql = "SELECT * FROM anime_recommondations ORDER BY id DESC LIMIT 1"
+        # last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
+        # self.id = last_row_tuple[0]
 
     @classmethod
     def read_all(cls):
         sql = '''SELECT * FROM anime_recommondations;'''
         all_anime_tuple = CURSOR.execute(sql).fetchall()
         return all_anime_tuple
+
+    def retreive_keywords(self):
+        sql = '''SELECT keywords FROM anime_recommondations;'''
+        all_keywords_tuples =  cursor.execute(sql).fetchall()
+        all_keywords = [keyword[0] for keyword in all_keywords_tuples]
+
+        return all_keywords
+
+    def retreive_recommondations(self):
+        sql = '''SELECT recommendations FROM anime_recommondations;'''
+        all_recommendations_tuples =  cursor.execute(sql).fetchall()
+        all_recommendations = [recommendation[0] for recommendation in all_recommendations_tuples]
+
+        return all_recommendations
+
 
 
 class Anime:
@@ -49,6 +65,8 @@ class Anime:
         last_row_sql = "SELECT * FROM animes_table ORDER BY id DESC LIMIT 1"
         last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
         self.id = last_row_tuple[0]
+
+
 
 class Questions:
     def __init__(self, questions):
@@ -84,3 +102,61 @@ class Questions:
         sql = '''UPDATE questions_table SET id = ? WHERE id = ?''' 
         CURSOR.execute(sql, [id, id1])
         CONN.commit()
+
+class About_keywords:
+    def __init__(self, about_keywords, responses, id = None):
+        self.id = id
+        self.about_keywords = about_keywords
+        self.responses = responses
+
+    @classmethod
+    def create_table(self):
+        sql = '''CREATE TABLE if not exists about_commands_table (id INTEGER PRIMARY KEY,
+        about_keywords TEXT, responses TEXT);'''
+        CURSOR.execute(sql)
+        CONN.commit()
+
+    def create(self):
+        sql = '''INSERT INTO about_commands_table(about_keywords, responses) VALUES (?,?)'''
+        CURSOR.execute(sql, [self.about_keywords, self.responses])
+        CONN .commit()
+
+        
+    def retreive_about_keywords(self):
+        sql = '''SELECT about_keywords FROM about_commands_table;'''
+        all_about_keywords_tuples =  cursor.execute(sql).fetchall()
+        all_about_keywords = [about_keyword[0] for about_keyword in all_about_keywords_tuples]
+
+        return all_keywords
+
+    def retreive_recommondations(self):
+        sql = '''SELECT responses FROM about_commands_table;'''
+        all_responses_tuples =  cursor.execute(sql).fetchall()
+        all_responses = [response[0] for response in all_responses_tuples]
+
+        return all_responses
+
+class Commands:
+    def __init__(self, commands, id = None):
+        self.id = id
+        self.commands = commands
+
+    @classmethod
+    def create_table(self):
+        sql = '''CREATE TABLE if not exists commands_table (id INTEGER PRIMARY KEY,
+        commands TEXT);'''
+        CURSOR.execute(sql)
+        CONN.commit()
+
+    def create(self):
+        sql = '''INSERT INTO commands_table(commands) VALUES (?)'''
+        CURSOR.execute(sql, [self.commands])
+        CONN .commit()
+
+    def rename_column(commands_table, recommends, commands):
+        # Construct the SQL query to rename the column
+        sql = '''ALTER TABLE commands_table RENAME COLUMN recommends TO commands;'''
+        
+        CURSOR.execute(sql)
+        CONN.commit()        
+
