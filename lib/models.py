@@ -48,22 +48,24 @@ class Anime:
 
 
     all_animes = []
+    all_art = []
 
-    def __init__(self, title):
+    def __init__(self, title, ascii_art, id = None):
         self.title = title
         self.id = id
+        self.ascii_art = ascii_art
     
     @classmethod
     def create_table(self):
         sql = '''CREATE TABLE if not exists animes_table (id INTEGER PRIMARY KEY,
-        title TEXT
+        title TEXT, ascii_art TEXT
         );'''
         CURSOR.execute(sql)
         CONN.commit()
 
     def create(self):
-        sql = '''INSERT INTO animes_table(title) VALUES (?)'''
-        CURSOR.execute(sql, [self.title])
+        sql = '''INSERT INTO animes_table(title, ascii_art) VALUES (?, ?)'''
+        CURSOR.execute(sql, [self.title, self.ascii_art])
         CONN .commit()
 
         # last_row_sql = "SELECT * FROM animes_table ORDER BY id DESC LIMIT 1"
@@ -71,11 +73,28 @@ class Anime:
         # self.id = last_row_tuple[0]
     @classmethod
     def read_all(cls):
-        sql = '''SELECT * FROM animes_table;'''
+        sql = '''SELECT title FROM animes_table;'''
 
         all_animes_tuples = CURSOR.execute(sql).fetchall()
-        cls.all_animes = [ anime[1] for anime in all_animes_tuples]
+        cls.all_animes = [ anime[0] for anime in all_animes_tuples]
         return cls.all_animes
+    
+    @classmethod
+    def read_all_art(cls):
+        sql = '''SELECT ascii_art FROM animes_table;'''
+
+        all_animes_art_tuples = CURSOR.execute(sql).fetchall()
+        print(all_animes_art_tuples)
+        cls.all_art = [ art[0] for art in all_animes_art_tuples]
+        return cls.all_art
+
+
+    @classmethod
+    def add_column(cls):
+        sql = '''ALTER TABLE animes_table 
+               ADD COLUMN ascii_art TEXT;'''
+        CURSOR.execute(sql)
+        CONN.commit() 
 
 
 class Questions:

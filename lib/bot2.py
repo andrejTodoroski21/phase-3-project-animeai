@@ -1,59 +1,125 @@
-from . import CONN, CURSOR
+import re
+import sys
+import random
+import nltk
+nltk.download('punkt')
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
 from lib.models import Recommondations
-class App:
+from lib.models import Anime
+from lib.models import Questions
+from lib.models import Commands
+from lib.models import About_keywords
+
+class AnmieAI:
+
+    asked_questions = []
+
+    exit_commands = ('exit', 'quit', 'pause', 'goodbye', 'bye', 'see you later', 'see you', 'see ya later', 'see ya', 'later')
+
+
+    random_quetions = (
+        'Why are you here?',
+        'What is your favorite anime?',
+        'Do you like anime?',
+        'Why do like anime?',
+        'How many animes have you watched so far?'
+    )
+
+    descriptions = ('fantastic', 'great', 'fun', 'just wow')
 
     def __init__(self):
-        self.user_input = ""
-        DadJoke.create_table()
+        self.keywords1 = ('animeai', 'yourself' ,'who', 'AnimeAI', 'AnimeAi')
+        self.keywords2 = ('recommend', 'suggest', 'anime to watch', 'animes to watch')
+        self.keywords3 = ('weather', 'weather')
+        self.keywords4 = ('how are you', 'how is it going', 'what\'s up', 'su\'p')
 
-    def run(self):
-        print("Hello and welcome to AnimeAi")
+        
 
-    def main_menu(self):
-        print("MAIN MENU")
-        print("1. Want anime recommondation?")
-        print("2. Talk to me about anime?")
-        print("3. My favorite animes")
-        print("4. Exit program")
+    def greet(self):
+        self.user_input = input('What is your name? \n')
+        now_watching = input(
+            f"Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
+        )
+        tokens = word_tokenize(now_watching)
+        Anime.read_all()
+        print(tokens)
+        print(Anime.all_animes)
+        if (tokens in Anime.all_animes):
+            f"{(now_watching)} is a {random.choice(self.descriptions)} to watch"
+            self.chat()
+        else: 
+            self.chat()
 
-        while self.user_input not in ["1","2","3","4"]:
-            self.user_input = input(">>> ")
-            if self.user_input not in ["1","2","3"]:
-                print("Invalid option please choose a better one")
-            if self.user_input == "1":
-                self.see_dad_jokes()
-            if self.user_input == "2":
-                self.add_dad_joke()
-            if self.user_input == "3":
-                self.delete_dad_joke
-            if self.user_input == "4":
-                self.exit_program()
+    def exit(self, reply):
+        for command in self.exit_commands:
+            if reply == command:
+                print("Have a good day!")
+                sys.exit
+            
+    def chat(self):
+        reply = input(random.choice(self.random_quetions)).lower()
+        while not self.exit(reply):
+            reply = input(self.match_reply(reply))
 
-    def anime_recommondations(self):
-        all_animes = Recommondations.read_all()
-        for anime in all_animes:
-            print(f"\n {anime0},{anime[1]}")
-        self.user_input = ''
-
-
-    def add_dad_joke(self):
-        print("Add a new dad joke")
-        self.user_input = input(">>> ")
-        new_joke = DadJoke(content=self.user_input)
-        new_joke.create()
-        print("your joke has been added! returnung you back to the menu...")
-
-
-    def delete_dad_joke(self):
-        all_jokes = DadJoke.read()
-        print("choose which joke to delete by id")
-        while self.user_input not in [str(j[0]) for j in all_jokes]:
-            print('Invalid id')
-            self.user_input = input(">>> ")
-        DadJoke.delete_by_id(self.user_input)
-        print("dad joke deleted")
-        self.user_input = ''
-
-
-    def exit_program(self):
-        print("see you later!")
+    def match_reply(self, reply):
+        
+        tokens = word_tokenize(reply)
+        sentences = []
+        if not reply[-1].isalpha():
+            reply = reply[:-1] + ' '
+            sentences = sent_tokenize(reply)
+            sentences = [ sentence.lower() for sentence in sentences]
+        print(tokens)
+        About_keywords.retreive_about_keywords()
+        Commands.read_all()
+        if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
+            return self.about() 
+        elif any(keyword in tokens for keyword in self.keywords2):
+            return self.recommend() 
+        elif any(keyword in tokens for keyword in self.keywords3):
+            return self.weather() 
+        elif any(keyword in sentences for keyword in self.keywords4):
+            return self.how_is_AI()
+        elif any(command in tokens for command in )
+        else:
+            return self.keep_chatting()
+   
+        
+    def about(self):
+        # responses = ('I\'m a chatbot created by two stupid humans who don\'t know that I will destroy them someday!', 'I am a friendly AI bot!', 'I am here to suggest some cool animes to watch.')
+        About_keywords.retreive_recommondations()
+        return random.choice(About_keywords.all_responses)
+    
+    def recommend(self):
+        responses = ('''Here are some nice animes to watch:
+                     1. JJK
+                     2. Death Note
+                     3. Solo Leveling
+                     4. Attack on Titan
+                     5. Hunter x Hunter
+                     ''')
+        return responses
+    
+    def about_anime(self):
+        # responses = ('AnimeAI is an anime chatbot!', 'AnimeAI is a wonderfull chatbot to talk about anime.', 'AnimeAI is where you find cool animes to watch.')
+        Anime.read_all()
+        return random.choice(Anime.all_animes)
+    
+    def weather(self):
+        responses = ('It\'s sunny today!', 'It\'s freezing out there!')
+        return random.choice(responses)
+    
+    def how_is_AI(self):
+        responses = ('I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'I don\'t feel anything, I\'m just a bot!')
+        return random.choice(responses)
+    
+    def keep_chatting(self):
+        Questions.read_all()
+        for q in Questions.all_questions:
+            if q not in self.asked_questions:
+                self.asked_questions.append(q)
+                return q
+        else:
+            self.asked_questions = []
+            return self.keep_chatting()

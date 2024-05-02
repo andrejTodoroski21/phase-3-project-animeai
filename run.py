@@ -4,5 +4,4 @@ from lib.__init__ import CURSOR, CONN
 
 bot = AnmieAI()
 
-
 bot.greet() 
