@@ -44,9 +44,12 @@ class AnmieAI:
         tokens = sent_tokenize(now_watching)
         tokens = [token.lower() for token in tokens]
         Anime.read_all()
+        Anime.read_all_art()
         if any(keyword in tokens for keyword in [anime.lower() for anime in Anime.all_animes]):
-            print(f"{(now_watching)} is a {random.choice(self.descriptions)}anime to watch")
+            print(f"{(now_watching)} is a {random.choice(self.descriptions)} anime to watch")
+            print(f"here is some are for {now_watching}: {Anime.all_art[0]} ")
             return self.chat()
+    
         else: 
             return self.chat()
 
