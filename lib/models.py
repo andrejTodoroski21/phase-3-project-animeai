@@ -45,6 +45,10 @@ class Recommondations:
 
 
 class Anime:
+
+
+    all_animes = []
+
     def __init__(self, title):
         self.title = title
         self.id = id
@@ -62,14 +66,23 @@ class Anime:
         CURSOR.execute(sql, [self.title])
         CONN .commit()
 
-        last_row_sql = "SELECT * FROM animes_table ORDER BY id DESC LIMIT 1"
-        last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
-        self.id = last_row_tuple[0]
+        # last_row_sql = "SELECT * FROM animes_table ORDER BY id DESC LIMIT 1"
+        # last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
+        # self.id = last_row_tuple[0]
+    @classmethod
+    def read_all(cls):
+        sql = '''SELECT * FROM animes_table;'''
 
+        all_animes_tuples = CURSOR.execute(sql).fetchall()
+        cls.all_animes = [ anime[1] for anime in all_animes_tuples]
+        return cls.all_animes
 
 
 class Questions:
-    def __init__(self, questions):
+
+    all_questions = []
+
+    def __init__(self, questions, id = None):
         self.questions = questions
         self.id = id
 
@@ -86,16 +99,18 @@ class Questions:
         CURSOR.execute(sql, [self.questions])
         CONN .commit()
 
-        last_row_sql = "SELECT * FROM questions_table ORDER BY id DESC LIMIT 1"
-        last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
-        self.id = last_row_tuple[0]
+        # last_row_sql = "SELECT * FROM questions_table ORDER BY id DESC LIMIT 1"
+        # last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
+        # self.id = last_row_tuple[0]
+
 
     @classmethod
     def read_all(cls):
         sql = '''SELECT * FROM questions_table;'''
 
-        all_questions_tuple = CURSOR.execute(sql).fetchall()
-        return all_questions_tuple
+        all_questions_tuples = CURSOR.execute(sql).fetchall()
+        cls.all_questions = [ question[1] for question in all_questions_tuples]
+        return cls.all_questions
 
     @classmethod
     def update_id(cls, id, id1):
@@ -104,6 +119,12 @@ class Questions:
         CONN.commit()
 
 class About_keywords:
+
+    all_about_keywords = []
+
+    all_responses = []
+
+
     def __init__(self, about_keywords, responses, id = None):
         self.id = id
         self.about_keywords = about_keywords
@@ -121,20 +142,21 @@ class About_keywords:
         CURSOR.execute(sql, [self.about_keywords, self.responses])
         CONN .commit()
 
-        
-    def retreive_about_keywords(self):
+    @classmethod
+    def retreive_about_keywords(cls):
         sql = '''SELECT about_keywords FROM about_commands_table;'''
-        all_about_keywords_tuples =  cursor.execute(sql).fetchall()
-        all_about_keywords = [about_keyword[0] for about_keyword in all_about_keywords_tuples]
+        all_about_keywords_tuples =  CURSOR.execute(sql).fetchall()
+        cls.all_about_keywords = [about_keyword[0] for about_keyword in all_about_keywords_tuples]
 
-        return all_keywords
-
-    def retreive_recommondations(self):
+        return cls.all_about_keywords
+    
+    @classmethod
+    def retreive_recommondations(cls):
         sql = '''SELECT responses FROM about_commands_table;'''
-        all_responses_tuples =  cursor.execute(sql).fetchall()
-        all_responses = [response[0] for response in all_responses_tuples]
+        all_responses_tuples =  CURSOR.execute(sql).fetchall()
+        cls.all_responses = [response[0] for response in all_responses_tuples]
 
-        return all_responses
+        return cls.all_responses
 
 class Commands:
     def __init__(self, commands, id = None):
