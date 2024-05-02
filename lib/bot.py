@@ -5,12 +5,17 @@ nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from lib.models import Recommondations
+from lib.models import Anime
+from lib.models import Questions
+from lib.models import Commands
+from lib.models import About_keywords
 
 class AnmieAI:
 
+    asked_questions = []
+
     exit_commands = ('exit', 'quit', 'pause', 'goodbye', 'bye', 'see you later', 'see you', 'see ya later', 'see ya', 'later')
 
-    all_animes = []
 
     random_quetions = (
         'Why are you here?',
@@ -36,8 +41,11 @@ class AnmieAI:
             f"Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
         )
         tokens = word_tokenize(now_watching)
-        if any(keyword in tokens for keyword in self.all_animes):
-            f"{(now_watching)} is a {random.choice(self.descriptions)}"
+        Anime.read_all()
+        print(tokens)
+        print(Anime.all_animes)
+        if (tokens in Anime.all_animes):
+            f"{(now_watching)} is a {random.choice(self.descriptions)} to watch"
             self.chat()
         else: 
             self.chat()
@@ -54,12 +62,14 @@ class AnmieAI:
 
     def match_reply(self, reply):
         tokens = word_tokenize(reply)
+        sentences = []
         if not reply[-1].isalpha():
             reply = reply[:-1] + ' '
             sentences = sent_tokenize(reply)
             sentences = [ sentence.lower() for sentence in sentences]
         print(tokens)
-        if any(keyword in tokens for keyword in self.keywords1):
+        About_keywords.retreive_about_keywords()
+        if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
             return self.about() 
         elif any(keyword in tokens for keyword in self.keywords2):
             return self.recommend() 
@@ -72,8 +82,9 @@ class AnmieAI:
    
         
     def about(self):
-        responses = ('I\'m a chatbot created by two stupid humans who don\'t know that I will destroy them someday!', 'I am a friendly AI bot!', 'I am here to suggest some cool animes to watch.')
-        return random.choice(responses)
+        # responses = ('I\'m a chatbot created by two stupid humans who don\'t know that I will destroy them someday!', 'I am a friendly AI bot!', 'I am here to suggest some cool animes to watch.')
+        About_keywords.retreive_recommondations()
+        return random.choice(About_keywords.all_responses)
     
     def recommend(self):
         responses = ('''Here are some nice animes to watch:
@@ -86,8 +97,9 @@ class AnmieAI:
         return responses
     
     def about_anime(self):
-        responses = ('AnimeAI is an anime chatbot!', 'AnimeAI is a wonderfull chatbot to talk about anime.', 'AnimeAI is where you find cool animes to watch.')
-        return random.choice(responses)
+        # responses = ('AnimeAI is an anime chatbot!', 'AnimeAI is a wonderfull chatbot to talk about anime.', 'AnimeAI is where you find cool animes to watch.')
+        Anime.read_all()
+        return random.choice(Anime.all_animes)
     
     def weather(self):
         responses = ('It\'s sunny today!', 'It\'s freezing out there!')
@@ -98,5 +110,11 @@ class AnmieAI:
         return random.choice(responses)
     
     def keep_chatting(self):
-        responses = self.random_quetions
-        return random.choice(responses) 
+        Questions.read_all()
+        for q in Questions.all_questions:
+            if q not in self.asked_questions:
+                self.asked_questions.append(q)
+                return q
+        else:
+            self.asked_questions = []
+            return self.keep_chatting()
