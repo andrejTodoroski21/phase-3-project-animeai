@@ -1,5 +1,7 @@
 import re
+import os
 import sys
+import requests
 import random
 import nltk
 nltk.download('punkt')
@@ -96,19 +98,35 @@ class AnmieAI:
             return self.weather() 
         elif any(keyword in sentences for keyword in self.keywords4):
             return self.how_is_AI()
-        elif any(keyword in tokens for keyword in self.keywords5):
-            return self.chat()
+        # elif any(keyword in tokens for keyword in self.keywords5):
+        #     return self.chat()
         else:
             user_input = input('You: ')
             DIALOGFLOW_PROJECT_ID = 'subtle-hangar-422214-m8'
             DIALOGFLOW_LANGUAGE_CODE = 'en'
             SESSION_ID = str(uuid.uuid4())
+            API_KEY = "AIzaSyDgH3lXSGlNwHGnzDpTQKtf1KllBhj_4QU"
+            text = user_input
+            return self.detect_intent(API_KEY, DIALOGFLOW_PROJECT_ID, SESSION_ID, text)
+            
 
-            session_client = dialogflow.SessionsClient()
-            session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
 
-            text_input = dialogflow.TextInput(user_input, language_code=DIALOGFLOW_LANGUAGE_CODE)
-            query_input = dialogflow.QueryInput(text=text_input)
+    def detect_intent(self, api_key, project_id, session_id, text):
+        url = f"https://dialogflow.googleapis.com/v2/projects/{project_id}/agent/sessions/{session_id}:detectIntent"
+        headers = {"Authorization": api_key, "Content-Type": "application/json"}
+        data = {
+            "queryInput": {
+                "text": {
+                    "text": text,
+                    "languageCode": "en-US"
+                
+            }
+        }
+        }
+        print(data)
+        response = requests.post(url, headers=headers, json=data)
+        print(response.json())
+        return response.json()
    
         
     def about(self):
