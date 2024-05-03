@@ -1,6 +1,11 @@
 from . import CONN, CURSOR
 
-class Recommondations:
+class Recommendations:
+
+    all_recommendations = []
+
+    all_keywords = []
+
     def __init__(self, recommendations, keywords, id = None):
         self.recommendations = recommendations
         self.id = id
@@ -8,14 +13,14 @@ class Recommondations:
 
     @classmethod
     def create_table(self):
-        sql = '''CREATE TABLE if not exists anime_recommondations(id INTEGER PRIMARY KEY,
+        sql = '''CREATE TABLE if not exists anime_recommendations(id INTEGER PRIMARY KEY,
         recommendations TEXT , keywords TEXT
         );'''
         CURSOR.execute(sql)
         CONN.commit()
 
     def create(self):
-        sql = '''INSERT INTO anime_recommondations(recommendations, keywords) VALUES (?, ?)'''
+        sql = '''INSERT INTO anime_recommendations(recommendations, keywords) VALUES (?, ?)'''
         CURSOR.execute(sql, [self.recommendations, self.keywords])
         CONN .commit()
         # last_row_sql = "SELECT * FROM anime_recommondations ORDER BY id DESC LIMIT 1"
@@ -27,20 +32,21 @@ class Recommondations:
         sql = '''SELECT * FROM anime_recommondations;'''
         all_anime_tuple = CURSOR.execute(sql).fetchall()
         return all_anime_tuple
-
-    def retreive_keywords(self):
+    @classmethod
+    def retreive_keywords(cls):
         sql = '''SELECT keywords FROM anime_recommondations;'''
-        all_keywords_tuples =  cursor.execute(sql).fetchall()
-        all_keywords = [keyword[0] for keyword in all_keywords_tuples]
+        all_keywords_tuples =  CURSOR.execute(sql).fetchall()
+        cls.all_keywords = [keyword[0] for keyword in all_keywords_tuples]
 
-        return all_keywords
-
-    def retreive_recommondations(self):
+        return cls.all_keywords
+    
+    @classmethod
+    def retreive_recommondations(cls):
         sql = '''SELECT recommendations FROM anime_recommondations;'''
-        all_recommendations_tuples =  cursor.execute(sql).fetchall()
-        all_recommendations = [recommendation[0] for recommendation in all_recommendations_tuples]
+        all_recommendations_tuples =  CURSOR.execute(sql).fetchall()
+        cls.all_recommendations = [recommendation[0] for recommendation in all_recommendations_tuples]
 
-        return all_recommendations
+        return cls.all_recommendations
 
 
 
@@ -49,6 +55,7 @@ class Anime:
 
     all_animes = []
     all_art = []
+    anime_art = { an:ar for (an,ar) in zip(all_animes, all_art)}
 
     def __init__(self, title, ascii_art, id = None):
         self.title = title
@@ -84,7 +91,6 @@ class Anime:
         sql = '''SELECT ascii_art FROM animes_table;'''
 
         all_animes_art_tuples = CURSOR.execute(sql).fetchall()
-        print(all_animes_art_tuples)
         cls.all_art = [ art[0] for art in all_animes_art_tuples]
         return cls.all_art
 
@@ -117,11 +123,6 @@ class Questions:
         sql = '''INSERT INTO questions_table (questions) VALUES (?)'''
         CURSOR.execute(sql, [self.questions])
         CONN .commit()
-
-        # last_row_sql = "SELECT * FROM questions_table ORDER BY id DESC LIMIT 1"
-        # last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
-        # self.id = last_row_tuple[0]
-
 
     @classmethod
     def read_all(cls):
