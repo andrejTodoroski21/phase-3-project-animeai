@@ -5,7 +5,10 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
-from lib.models import Recommondations
+from google.cloud import dialogflow_v2beta1 as dialogflow
+from google.api_core.exceptions import InvalidArgument
+import uuid
+from lib.models import Recommendations
 from lib.models import Anime
 from lib.models import Questions
 from lib.models import Commands
@@ -33,6 +36,7 @@ class AnmieAI:
         self.keywords2 = ('recommend', 'suggest', 'anime to watch', 'animes to watch')
         self.keywords3 = ('weather', 'weather')
         self.keywords4 = ('how are you', 'how is it going', 'what\'s up', 'su\'p')
+        self.keywords5 = ('questions', 'random')
 
         
 
@@ -45,13 +49,16 @@ class AnmieAI:
         tokens = [token.lower() for token in tokens]
         Anime.read_all()
         Anime.read_all_art()
+        anime_art = { an:ar for (an,ar) in zip(Anime.all_animes, Anime.all_art)}
         if any(keyword in tokens for keyword in [anime.lower() for anime in Anime.all_animes]):
             print(f"{(now_watching)} is a {random.choice(self.descriptions)} anime to watch")
-            print(f"here is some are for {now_watching}: {Anime.all_art[0]} ")
+            for key, value in anime_art.items():
+                if now_watching == key:
+                    print(f"here is some are for {now_watching}: {value}")
             return self.chat()
     
-        else: 
-            return self.chat()
+        # else: 
+        #     return self.chat()
 
     def exit(self, reply):
         Commands.read_all()
@@ -59,12 +66,8 @@ class AnmieAI:
             print ("Have a good day!")
             return True
         else:
-            return self.chat()
+            return self.match_reply(reply)
 
-    # def chat(self):
-    #     reply = input(random.choice(self.random_quetions)).lower()
-    #     while not self.exit(reply):
-    #         reply = input(self.match_reply(reply))
     def chat(self):
         while True:
             reply = input(random.choice(self.random_quetions)).lower()
@@ -84,35 +87,42 @@ class AnmieAI:
             sentences = [ sentence.lower() for sentence in sentences]
         print(tokens)
         About_keywords.retreive_about_keywords()
-        Commands.read_all()
+        Recommendations.retreive_keywords()
         if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
             return self.about() 
-        elif any(keyword in tokens for keyword in self.keywords2):
+        elif any(keyword in tokens for keyword in Recommendations.all_keywords):
             return self.recommend() 
         elif any(keyword in tokens for keyword in self.keywords3):
             return self.weather() 
         elif any(keyword in sentences for keyword in self.keywords4):
             return self.how_is_AI()
-        # elif any(keyword in tokens for keyword in Commands.all_commands):
-        #     return self.exit(reply)
-        else:
+        elif any(keyword in tokens for keyword in self.keywords5):
             return self.chat()
+        else:
+            user_input = input('You: ')
+            DIALOGFLOW_PROJECT_ID = 'subtle-hangar-422214-m8'
+            DIALOGFLOW_LANGUAGE_CODE = 'en'
+            SESSION_ID = str(uuid.uuid4())
+
+            session_client = dialogflow.SessionsClient()
+            session = session_client.session_path(DIALOGFLOW_PROJECT_ID, SESSION_ID)
+
+            text_input = dialogflow.TextInput(user_input, language_code=DIALOGFLOW_LANGUAGE_CODE)
+            query_input = dialogflow.QueryInput(text=text_input)
    
         
     def about(self):
-        # responses = ('I\'m a chatbot created by two stupid humans who don\'t know that I will destroy them someday!', 'I am a friendly AI bot!', 'I am here to suggest some cool animes to watch.')
         About_keywords.retreive_recommondations()
-        return random.choice(About_keywords.all_responses)
+        # print(About_keywords.all_responses)
+        print(random.choice(About_keywords.all_responses))
+        user_input = input('')
+        return self.match_reply(user_input)
     
     def recommend(self):
-        responses = ('''Here are some nice animes to watch:
-                     1. JJK
-                     2. Death Note
-                     3. Solo Leveling
-                     4. Attack on Titan
-                     5. Hunter x Hunter
-                     ''')
-        return responses
+        Recommendations.retreive_recommondations()
+        print(random.choice(Recommendations.all_recommendations))
+        user_input = input('')
+        return self.match_reply(user_input)
     
     def about_anime(self):
         # responses = ('AnimeAI is an anime chatbot!', 'AnimeAI is a wonderfull chatbot to talk about anime.', 'AnimeAI is where you find cool animes to watch.')
@@ -121,11 +131,15 @@ class AnmieAI:
     
     def weather(self):
         responses = ('It\'s sunny today!', 'It\'s freezing out there!')
-        return random.choice(responses)
+        print(random.choice(responses))
+        user_input = input('')
+        return self.match_reply(user_input)
     
     def how_is_AI(self):
         responses = ('I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'I don\'t feel anything, I\'m just a bot!')
-        return random.choice(responses)
+        print(random.choice(responses))
+        user_input = input('')
+        return self.match_reply(user_input)
     
     # def keep_chatting(self):
     #     Questions.read_all()

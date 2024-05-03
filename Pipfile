@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 nltk = "*"
+dialogflow = "*"
+google-cloud-dialogflow = "*"
 
 [dev-packages]
 
