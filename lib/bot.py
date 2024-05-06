@@ -7,8 +7,8 @@ import nltk
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
+from google.oauth2 import service_account
 from google.cloud import dialogflow_v2beta1 as dialogflow
-from google.api_core.exceptions import InvalidArgument
 import uuid
 from lib.models import Recommendations
 from lib.models import Anime
@@ -101,32 +101,41 @@ class AnmieAI:
         # elif any(keyword in tokens for keyword in self.keywords5):
         #     return self.chat()
         else:
-            user_input = input('You: ')
-            DIALOGFLOW_PROJECT_ID = 'subtle-hangar-422214-m8'
-            DIALOGFLOW_LANGUAGE_CODE = 'en'
-            SESSION_ID = str(uuid.uuid4())
-            API_KEY = "AIzaSyDgH3lXSGlNwHGnzDpTQKtf1KllBhj_4QU"
-            text = user_input
-            return self.detect_intent(API_KEY, DIALOGFLOW_PROJECT_ID, SESSION_ID, text)
-            
+            # Load service account key
+            credentials = service_account.Credentials.from_service_account_file('/home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json') 
 
+            # Create a Dialogflow client
+            client = dialogflow.SessionsClient(credentials=credentials)
 
-    def detect_intent(self, api_key, project_id, session_id, text):
-        url = f"https://dialogflow.googleapis.com/v2/projects/{project_id}/agent/sessions/{session_id}:detectIntent"
-        headers = {"Authorization": api_key, "Content-Type": "application/json"}
-        data = {
-            "queryInput": {
-                "text": {
-                    "text": text,
-                    "languageCode": "en-US"
-                
+            # Define project ID and session ID
+            project_id = 'rich-world-329001'
+            session_id = str(uuid.uuid4())
+
+            # Create session path
+            session_path = client.session_path(project_id, session_id)
+
+            # User query
+            query = input('Hmm: ')
+
+            # Define query input
+            query_input = {
+                'text': { 
+                    'text': query,
+                    'language_code': 'en-US'
+                }
             }
-        }
-        }
-        print(data)
-        response = requests.post(url, headers=headers, json=data)
-        print(response.json())
-        return response.json()
+
+            # Send query to Dialogflow
+            response = client.detect_intent(
+                session=session_path,
+                query_input=query_input
+            )
+
+            # Extract response from Dialogflow
+            response_text = response.query_result.fulfillment_text
+
+            # Print response
+            print('AnimeAi:', response_text)
    
         
     def about(self):
