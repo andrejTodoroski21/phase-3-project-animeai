@@ -4,7 +4,7 @@ import sys
 import requests
 import random
 import nltk
-nltk.download('punkt')
+# nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from google.oauth2 import service_account
@@ -39,6 +39,7 @@ class AnmieAI:
         self.keywords3 = ('weather', 'weather')
         self.keywords4 = ('how are you', 'how is it going', 'what\'s up', 'su\'p')
         self.keywords5 = ('questions', 'random')
+        self.keywords6 = ('ascii art', 'anime art', 'show me ascii art', 'art')
 
         
 
@@ -58,6 +59,7 @@ class AnmieAI:
                 if now_watching == key:
                     print(f"here is some are for {now_watching}: {value}")
             return self.chat()
+        return self.chat()
     
         # else: 
         #     return self.chat()
@@ -72,83 +74,88 @@ class AnmieAI:
 
     def chat(self):
         while True:
-            reply = input(random.choice(self.random_quetions)).lower()
+            reply = input('You: ').lower()
             if self.exit(reply):
                 return
             else:
-                reply = input(self.match_reply(reply))
+                return self.match_reply(reply)
 
     
 
     def match_reply(self, reply):
-        tokens = word_tokenize(reply)
-        sentences = []
-        if not reply[-1].isalpha():
-            reply = reply[:-1] + ' '
+        if reply in Commands.all_commands:
+            return self.exit(reply)
+        else:
+            tokens = word_tokenize(reply)
+            sentences = []
             sentences = sent_tokenize(reply)
             sentences = [ sentence.lower() for sentence in sentences]
-        print(tokens)
-        About_keywords.retreive_about_keywords()
-        Recommendations.retreive_keywords()
-        if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
-            return self.about() 
-        elif any(keyword in tokens for keyword in Recommendations.all_keywords):
-            return self.recommend() 
-        elif any(keyword in tokens for keyword in self.keywords3):
-            return self.weather() 
-        elif any(keyword in sentences for keyword in self.keywords4):
-            return self.how_is_AI()
-        # elif any(keyword in tokens for keyword in self.keywords5):
-        #     return self.chat()
-        else:
-            # Load service account key
-            credentials = service_account.Credentials.from_service_account_file('/Users/andrejtodoroski/Development/code/phase-3/sensitive-files/rich-world-329001-e02b32691e8a.json') 
+            print(sentences)
+            About_keywords.retreive_about_keywords()
+            Recommendations.retreive_keywords()
+            if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
+                return self.about()
+            
+            elif any(keyword in tokens for keyword in Recommendations.all_keywords):
+                return self.recommend()
+            
+            elif any(keyword in sentences for keyword in self.keywords4):
+                return self.how_is_AI()
+            
+            elif any(keyword in sentences for keyword in self.keywords6):
+                return self.ascii_art(reply)
+            
+            else:
+                # Load service account key
+                credentials = service_account.Credentials.from_service_account_file('/home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json') 
 
-            # Create a Dialogflow client
-            client = dialogflow.SessionsClient(credentials=credentials)
+                # Create a Dialogflow client
+                client = dialogflow.SessionsClient(credentials=credentials)
 
-            # Define project ID and session ID
-            project_id = 'rich-world-329001'
-            session_id = str(uuid.uuid4())
+                # Define project ID and session ID
+                project_id = 'rich-world-329001'
+                session_id = str(uuid.uuid4())
 
-            # Create session path
-            session_path = client.session_path(project_id, session_id)
+                # Create session path
+                session_path = client.session_path(project_id, session_id)
 
-            # User query
-            query = input('Hmm: ')
+                # User query
+                query = reply
 
-            # Define query input
-            query_input = {
-                'text': { 
-                    'text': query,
-                    'language_code': 'en-US'
+                # Define query input
+                query_input = {
+                    'text': { 
+                        'text': query,
+                        'language_code': 'en-US'
+                    }
                 }
-            }
 
-            # Send query to Dialogflow
-            response = client.detect_intent(
-                session=session_path,
-                query_input=query_input
-            )
+                # Send query to Dialogflow
+                response = client.detect_intent(
+                    session=session_path,
+                    query_input=query_input
+                )
 
-            # Extract response from Dialogflow
-            response_text = response.query_result.fulfillment_text
+                # Extract response from Dialogflow
+                response_text = response.query_result.fulfillment_text
 
-            # Print response
-            print('AnimeAi:', response_text)
+                # Print response
+                print('AnimeAi:', response_text)
+                new_input = input('You: ')
+                return self.match_reply(new_input)
    
         
     def about(self):
         About_keywords.retreive_recommondations()
         # print(About_keywords.all_responses)
         print(random.choice(About_keywords.all_responses))
-        user_input = input('')
+        user_input = input('You: ')
         return self.match_reply(user_input)
     
     def recommend(self):
         Recommendations.retreive_recommondations()
         print(random.choice(Recommendations.all_recommendations))
-        user_input = input('')
+        user_input = input('You: ')
         return self.match_reply(user_input)
     
     def about_anime(self):
@@ -156,24 +163,22 @@ class AnmieAI:
         Anime.read_all()
         return random.choice(Anime.all_animes)
     
-    def weather(self):
-        responses = ('It\'s sunny today!', 'It\'s freezing out there!')
-        print(random.choice(responses))
-        user_input = input('')
-        return self.match_reply(user_input)
-    
     def how_is_AI(self):
         responses = ('I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'I don\'t feel anything, I\'m just a bot!')
         print(random.choice(responses))
-        user_input = input('')
+        user_input = input('You: ')
         return self.match_reply(user_input)
-    
-    # def keep_chatting(self):
-    #     Questions.read_all()
-    #     for q in Questions.all_questions:
-    #         if q not in self.asked_questions:
-    #             self.asked_questions.append(q)
-    #             return q
-    #     # else:
-    #     #     self.asked_questions = []
-    #     #     return self.keep_chatting()
+
+    def ascii_art(self, reply):
+        user_input = input('Which anime art you want to see: ')
+        Anime.read_all()
+        Anime.read_all_art()
+        anime_art = { an:ar for (an,ar) in zip(Anime.all_animes, Anime.all_art)}
+        if reply in self.keywords6:
+            for key, value in anime_art.items():
+                if user_input == key:
+                    print(f"here is some are for {user_input}: {value}")
+                    return self.match_reply('exit art method')
+        else: 
+            print(f'Sorry, we don\'t have {user_input} in our database!')
+            return self.match_reply(user_input)
