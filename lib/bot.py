@@ -1,9 +1,6 @@
 import re
-import os
-import sys
 import random
 import nltk
-# nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from google.oauth2 import service_account
@@ -11,7 +8,6 @@ from google.cloud import dialogflow_v2beta1 as dialogflow
 import uuid
 from lib.models import Recommendations
 from lib.models import Anime
-from lib.models import Questions
 from lib.models import Commands
 from lib.models import About_keywords
 
@@ -68,8 +64,6 @@ class AnmieAI:
             return self.chat()
         return self.chat()
     
-        # else: 
-        #     return self.chat()
 
     def exit(self, reply):
         Commands.read_all()
@@ -79,6 +73,7 @@ class AnmieAI:
         else:
             return self.match_reply(reply)
 
+
     def chat(self):
         while True:
             reply = input('You: ').lower()
@@ -87,7 +82,6 @@ class AnmieAI:
             else:
                 return self.match_reply(reply)
 
-    
 
     def match_reply(self, reply):
         if reply in Commands.all_commands:
@@ -99,7 +93,8 @@ class AnmieAI:
             sentences = [ sentence.lower() for sentence in sentences]
             About_keywords.retreive_about_keywords()
             Recommendations.retreive_keywords()
-            if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
+            print(About_keywords.all_about_keywords)
+            if any(keyword in sentences for keyword in About_keywords.all_about_keywords):
                 return self.about()
             
             elif any(keyword in tokens for keyword in Recommendations.all_keywords):
@@ -112,7 +107,6 @@ class AnmieAI:
                 return self.ascii_art(reply)
             
             else:
-                # Load service account key
                 # /home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json
                 # ''/Users/andrejtodoroski/Development/code/phase-3/sensitive-files/rich-world-329001-e02b32691e8a.json
                 credentials = service_account.Credentials.from_service_account_file('/home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json') 
@@ -155,22 +149,15 @@ class AnmieAI:
         
     def about(self):
         About_keywords.retreive_recommondations()
-        # print(About_keywords.all_responses)
         print(random.choice(About_keywords.all_responses))
         user_input = input('You: ')
         return self.match_reply(user_input)
-        # this is a comment
     
     def recommend(self):
         Recommendations.retreive_recommondations()
         print(random.choice(Recommendations.all_recommendations))
         user_input = input('You: ')
         return self.match_reply(user_input)
-    
-    def about_anime(self):
-        # responses = ('AnimeAI is an anime chatbot!', 'AnimeAI is a wonderfull chatbot to talk about anime.', 'AnimeAI is where you find cool animes to watch.')
-        Anime.read_all()
-        return random.choice(Anime.all_animes)
     
     def how_is_AI(self):
         responses = ('I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'I don\'t feel anything, I\'m just a bot!')
