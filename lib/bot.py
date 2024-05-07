@@ -43,6 +43,14 @@ class AnmieAI:
         
 
     def greet(self):
+        print('''
+        Here are some commands you can ask AnimeAi
+        1. Ask for "art"
+        2. Ask for recommondations ("recommend"/"suggest")
+        3. Ask AnimeAi about itself ("who are you"/"yourself")
+        4. Ask AnimeAi how it is doing ("how are you")
+        5. Lastly you can chat with AnimeAi about anime if anime is in db
+        ''')
         self.user_input = input('What is your name? \n')
         now_watching = input(
             f"Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
@@ -89,7 +97,6 @@ class AnmieAI:
             sentences = []
             sentences = sent_tokenize(reply)
             sentences = [ sentence.lower() for sentence in sentences]
-            print(sentences)
             About_keywords.retreive_about_keywords()
             Recommendations.retreive_keywords()
             if any(keyword in tokens for keyword in About_keywords.all_about_keywords):
@@ -175,11 +182,14 @@ class AnmieAI:
         Anime.read_all()
         Anime.read_all_art()
         anime_art = { an:ar for (an,ar) in zip(Anime.all_animes, Anime.all_art)}
+        # print(anime_art)
         if reply in self.keywords6:
             for key, value in anime_art.items():
                 if user_input == key:
                     print(f"here is some are for {user_input}: {value}")
                     return self.match_reply('exit art method')
-        else: 
+                    break
+        else:
             print(f'Sorry, we don\'t have {user_input} in our database!')
-            return self.match_reply(user_input)
+            return self.match_reply('exit art method')
+
