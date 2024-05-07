@@ -15,7 +15,7 @@ class Recommendations:
     def create_table(self):
         sql = '''CREATE TABLE if not exists anime_recommendations(id INTEGER PRIMARY KEY,
         recommendations TEXT , keywords TEXT
-        );'''
+        );''' 
         CURSOR.execute(sql)
         CONN.commit()
 
