@@ -115,7 +115,7 @@ class AnmieAI:
                 # Load service account key
                 # /home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json
                 # ''/Users/andrejtodoroski/Development/code/phase-3/sensitive-files/rich-world-329001-e02b32691e8a.json
-                credentials = service_account.Credentials.from_service_account_file('/Users/andrejtodoroski/Development/code/phase-3/sensitive-files/rich-world-329001-e02b32691e8a.json') 
+                credentials = service_account.Credentials.from_service_account_file('/home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json') 
 
                 # Create a Dialogflow client
                 client = dialogflow.SessionsClient(credentials=credentials)
@@ -183,14 +183,13 @@ class AnmieAI:
         Anime.read_all()
         Anime.read_all_art()
         anime_art = { an:ar for (an,ar) in zip(Anime.all_animes, Anime.all_art)}
-        # print(anime_art)
         if reply in self.keywords6:
             for key, value in anime_art.items():
                 if user_input == key:
                     print(f"here is some are for {user_input}: {value}")
                     return self.match_reply('exit art method')
                     break
-        else:
+
             print(f'Sorry, we don\'t have {user_input} in our database!')
             return self.match_reply('exit art method')
 
