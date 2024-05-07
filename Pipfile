@@ -8,6 +8,7 @@ nltk = "*"
 dialogflow = "*"
 google-cloud-dialogflow = "*"
 requests = "*"
+gooey = "*"
 
 [dev-packages]
 

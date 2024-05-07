@@ -1,7 +1,6 @@
 import re
 import os
 import sys
-import requests
 import random
 import nltk
 # nltk.download('punkt')
@@ -17,7 +16,7 @@ from lib.models import Commands
 from lib.models import About_keywords
 
 class AnmieAI:
-
+    
     asked_questions = []
 
     exit_commands = ('exit', 'quit', 'pause', 'goodbye', 'bye', 'see you later', 'see you', 'see ya later', 'see ya', 'later')
