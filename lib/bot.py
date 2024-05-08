@@ -109,7 +109,7 @@ class AnmieAI():
             else:
                 # /home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json
                 # ''/Users/andrejtodoroski/Development/code/phase-3/sensitive-files/rich-world-329001-e02b32691e8a.json
-                credentials = service_account.Credentials.from_service_account_file('/Users/andrejtodoroski/Development/code/phase-3/sensitive-files/rich-world-329001-e02b32691e8a.json') 
+                credentials = service_account.Credentials.from_service_account_file('/home/jj/Development/code/phase-3/senstive-files/rich-world-329001-e02b32691e8a.json') 
 
                 # Create a Dialogflow client
                 client = dialogflow.SessionsClient(credentials=credentials)
