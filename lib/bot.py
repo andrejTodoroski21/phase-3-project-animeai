@@ -93,7 +93,7 @@ class AnmieAI():
             sentences = [ sentence.lower() for sentence in sentences]
             About_keywords.retreive_about_keywords()
             Recommendations.retreive_keywords()
-            print(About_keywords.all_about_keywords)
+            
             if any(keyword in sentences for keyword in About_keywords.all_about_keywords):
                 return self.about()
             
