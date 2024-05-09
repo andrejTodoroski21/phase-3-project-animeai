@@ -83,7 +83,7 @@ class Anime:
         sql = '''SELECT title FROM animes_table;'''
 
         all_animes_tuples = CURSOR.execute(sql).fetchall()
-        cls.all_animes = [ anime[0] for anime in all_animes_tuples]
+        cls.all_animes = [ anime[0].lower() for anime in all_animes_tuples]
         return cls.all_animes
     
     @classmethod
@@ -166,7 +166,7 @@ class About_keywords:
     def retreive_about_keywords(cls):
         sql = '''SELECT about_keywords FROM about_commands_table;'''
         all_about_keywords_tuples =  CURSOR.execute(sql).fetchall()
-        cls.all_about_keywords = [about_keyword[0] for about_keyword in all_about_keywords_tuples]
+        cls.all_about_keywords = [about_keyword[0].lower() for about_keyword in all_about_keywords_tuples]
 
         return cls.all_about_keywords
     
@@ -174,7 +174,7 @@ class About_keywords:
     def retreive_recommondations(cls):
         sql = '''SELECT responses FROM about_commands_table;'''
         all_responses_tuples =  CURSOR.execute(sql).fetchall()
-        cls.all_responses = [response[0] for response in all_responses_tuples]
+        cls.all_responses = [response[0].lower() for response in all_responses_tuples]
 
         return cls.all_responses
 
@@ -210,6 +210,6 @@ class Commands:
         sql = '''SELECT * FROM commands_table;'''
 
         all_commands_tuples = CURSOR.execute(sql).fetchall()
-        cls.all_commands = [ command[1] for command in all_commands_tuples]
+        cls.all_commands = [ command[1].lower() for command in all_commands_tuples]
         return cls.all_commands
 
