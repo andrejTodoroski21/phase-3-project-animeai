@@ -23,9 +23,6 @@ class Recommendations:
         sql = '''INSERT INTO anime_recommendations(recommendations, keywords) VALUES (?, ?)'''
         CURSOR.execute(sql, [self.recommendations, self.keywords])
         CONN .commit()
-        # last_row_sql = "SELECT * FROM anime_recommondations ORDER BY id DESC LIMIT 1"
-        # last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
-        # self.id = last_row_tuple[0]
 
     @classmethod
     def read_all(cls):
@@ -75,9 +72,6 @@ class Anime:
         CURSOR.execute(sql, [self.title, self.ascii_art])
         CONN .commit()
 
-        # last_row_sql = "SELECT * FROM animes_table ORDER BY id DESC LIMIT 1"
-        # last_row_tuple = CURSOR.execute(last_row_sql).fetchone()
-        # self.id = last_row_tuple[0]
     @classmethod
     def read_all(cls):
         sql = '''SELECT title FROM animes_table;'''
