@@ -47,20 +47,20 @@ class AnmieAI():
         4. Ask AnimeAi how it is doing ("how are you")
         5. Lastly you can chat with AnimeAi about anime if anime is in db
         ''')
-        self.user_input = input('What is your name? \n')
+        self.user_input = input('AnimeAi: What is your name? \n')
         now_watching = input(
-            f"Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
+            f"AnimeAi: Hey! {self.user_input}. I am AnimeAI. What anime are you watching? \n"
         )
         tokens = sent_tokenize(now_watching)
         tokens = [token.lower() for token in tokens]
         Anime.read_all()
         Anime.read_all_art()
         anime_art = { an:ar for (an,ar) in zip(Anime.all_animes, Anime.all_art)}
-        if any(keyword in tokens for keyword in [anime.lower() for anime in Anime.all_animes]):
-            print(f"{(now_watching)} is a {random.choice(self.descriptions)} anime to watch")
+        if any(keyword in tokens for keyword in [anime for anime in Anime.all_animes]):
+            print(f"{(now_watching).upper()} is a {random.choice(self.descriptions)} anime to watch")
             for key, value in anime_art.items():
-                if now_watching == key:
-                    print(f"here is some are for {now_watching}: {value}")
+                if now_watching.lower() == key:
+                    print(f"AnimeAi: here is some art for {now_watching}: {value}")
             return self.chat()
         return self.chat()
     
@@ -68,7 +68,7 @@ class AnmieAI():
     def exit(self, reply):
         Commands.read_all()
         if reply in Commands.all_commands:
-            print ("Have a good day!")
+            print ("AnimeAi: Have a good day!")
             return True
         else:
             return self.match_reply(reply)
@@ -93,7 +93,6 @@ class AnmieAI():
             sentences = [ sentence.lower() for sentence in sentences]
             About_keywords.retreive_about_keywords()
             Recommendations.retreive_keywords()
-            print(About_keywords.all_about_keywords)
             if any(keyword in sentences for keyword in About_keywords.all_about_keywords):
                 return self.about()
             
@@ -160,23 +159,23 @@ class AnmieAI():
         return self.match_reply(user_input)
     
     def how_is_AI(self):
-        responses = ('I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'I don\'t feel anything, I\'m just a bot!')
+        responses = ('AnimeAi: I\'m a bot, I don\'t have feelings, but I\'m hoping you\'re doing well.', 'AnimeAi: I don\'t feel anything, I\'m just a bot!')
         print(random.choice(responses))
         user_input = input('You: ')
         return self.match_reply(user_input)
 
     def ascii_art(self, reply):
-        user_input = input('Which anime art you want to see: ')
+        user_input = input('AnimeAi: Which anime art you want to see: ')
         Anime.read_all()
         Anime.read_all_art()
         anime_art = { an:ar for (an,ar) in zip(Anime.all_animes, Anime.all_art)}
         if reply in self.keywords6:
             for key, value in anime_art.items():
-                if user_input == key:
-                    print(f"here is some are for {user_input}: {value}")
+                if user_input.lower() == key.lower():
+                    print(f"AnimeAi: here is some art for {user_input}: {value}")
                     return self.match_reply('exit art method')
                     break
 
-            print(f'Sorry, we don\'t have {user_input} in our database!')
+            print(f'AnimeAi: Sorry, we don\'t have {user_input} in our database!')
             return self.match_reply('exit art method')
 
