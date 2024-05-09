@@ -1,4 +1,4 @@
-import re
+# import re
 import random
 import nltk
 from nltk.tokenize import word_tokenize
